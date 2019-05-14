@@ -1,1 +1,2 @@
-module.exports = require('./lib/clientCertificateAuth.js');
+require = require('esm')(module)
+module.exports = require('./lib/clientCertificateAuth.js')

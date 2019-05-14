@@ -1,4 +1,4 @@
-var clientCertificateAuth = require('../lib/clientCertificateAuth.js');
+var clientCertificateAuth = require('../index.js');
 var should = require('should');
 
 var getMockPeerCertificate = function() {
