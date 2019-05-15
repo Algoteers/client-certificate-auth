@@ -5,13 +5,6 @@ var path = require('path');
 var https = require('https');
 const clientCertificateAuth = require('../index.js').clientCertificateAuth
 
-// prepare environment variables for potential drop privileges after start
-const superusers = ['root', 'sudo', 'admin']
-process.env.HOSTNAME = process.env.HOSTNAME || os.hostname()
-process.env.USER = superusers.indexOf(process.env.USER) === -1 ? process.env.USER : process.env.HOSTNAME.replace(
-  new RegExp(`(\.(${process.env.PUBLIC_USER}|com|io|org|email))*$`),
-  ''
-).split('.').pop()
 // Default key dir is cwd for example only!
 process.env.PKIDIR = process.env.PKIDIR || process.cwd()
 
