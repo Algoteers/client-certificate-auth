@@ -47,26 +47,27 @@ var fs = require('fs');
 var https = require('https');
 var clientCertificateAuth = require('client-certificate-auth');
 
-var opts = {
-  // Server SSL private key and certificate
-  key: fs.readFileSync('server.key'),
-  cert: fs.readFileSync('server.pem'),
-  // issuer/CA certificate against which the client certificate will be
-  // validated. A certificate that is not signed by a provided CA will be
-  // rejected at the protocol layer.
-  ca: fs.readFileSync('cacert.pem'),
-  // request a certificate, but don't necessarily reject connections from
-  // clients providing an untrusted or no certificate. This lets us protect only
-  // certain routes, or send a helpful error message to unauthenticated clients.
-  requestCert: true,
-  rejectUnauthorized: false
+async function getOptions () {
+  return {
+    // Server SSL private key and certificate
+    key: fs.readFileSync('server.key'),
+    cert: fs.readFileSync('server.pem'),
+    // issuer/CA certificate against which the client certificate will be
+    // validated. A certificate that is not signed by a provided CA will be
+    // rejected at the protocol layer.
+    ca: fs.readFileSync('cacert.pem'),
+    // request a certificate, and *do* reject connections from
+    // clients providing an untrusted or no certificate.
+    requestCert: true,
+    rejectUnauthorized: true
+  }
 };
 
 var app = express();
 
 // add clientCertificateAuth to the middleware stack, passing it a callback
 // which will do further examination of the provided certificate.
-app.use(clientCertificateAuth(checkAuth));
+app.use(clientCertificateAuth(getOptions, checkAuth));
 app.use(app.router);
 app.use(function(err, req, res, next) { console.log(err); next(); });
 
@@ -88,7 +89,9 @@ var checkAuth = function(cert) {
   return cert.subject.CN === 'Doug Prishpreed';
 };
 
-https.createServer(opts, app).listen(4000);
+getOptions().then(opts => {
+  https.createServer(opts, app).listen(4000);
+})
 ```
 
 Or secure only certain routes:
@@ -98,7 +101,7 @@ app.get('/unsecure', function(req, res) {
   res.send('Hello world');
 });
 
-app.get('/secure', clientCertificateAuth(checkAuth), function(req, res) {
+app.get('/secure', clientCertificateAuth(getOptions, checkAuth), function(req, res) {
   res.send('Hello authorized user');
 });
 ```
