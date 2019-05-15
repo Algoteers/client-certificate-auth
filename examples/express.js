@@ -38,6 +38,7 @@ app.get('/secure', clientCertificateAuth(getOptions, () => true), function(req, 
 });
 
 getOptions().then(opts => {
+  opts.rejectUnauthorized = false // set to false initially for public view
   https.createServer(opts, app).listen(4000);
 })
 
