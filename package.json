@@ -11,7 +11,6 @@
     "node": ">= 0.6.x"
   },
   "optionalDependencies": {
-  "dependencies": {
     "esm": "^3.2.22"
   },
   "devDependencies": {
